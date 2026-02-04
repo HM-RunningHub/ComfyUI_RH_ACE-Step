@@ -2,14 +2,14 @@
 
 ![License](https://img.shields.io/badge/License-Apache%202.0-green)
 
-ComfyUI custom nodes for [ACE-Step](https://github.com/ace-step/ACE-Step) music generation model, enabling AI-powered music creation within ComfyUI.
+ComfyUI custom nodes for [ACE-Step 1.5](https://github.com/ace-step/ACE-Step-1.5) - the most powerful open-source music generation model. Generate AI music directly in ComfyUI with commercial-grade quality.
 
 ## ✨ Features
 
 - **ACE-Step Model Loader** - Load ACE-Step DiT and LLM models
 - **Generation Parameters** - Configure music generation settings (BPM, duration, key, time signature)
 - **Music Creator** - Generate music from text descriptions and lyrics
-- **Artist Node** - AI-powered lyrics and music composition assistant with multi-language support
+- **Artist Node** - AI-powered lyrics and music composition assistant with 50+ language support
 
 ## 🛠️ Installation
 
@@ -22,20 +22,68 @@ git clone https://github.com/HM-RunningHub/ComfyUI_RH_ACE-Step.git
 
 2. Restart ComfyUI
 
-## 📦 Model Download
+## 📦 Model Download & Installation
 
-Download ACE-Step models and place them in `ComfyUI/models/ACE-Step/`:
+### Model Directory Structure
 
-- ACE-Step DiT model: `acestep-v15-turbo`
-- ACE-Step LLM model: `acestep-5Hz-lm-1.7B` or `acestep-5Hz-lm-4B`
+All models must be placed in `ComfyUI/models/ACE-Step/` with the following structure:
 
-Model download link: [ACE-Step Official Repository](https://github.com/ace-step/ACE-Step)
+```
+ComfyUI/
+└── models/
+    └── ACE-Step/
+        ├── vae/                          # VAE model (required)
+        ├── Qwen3-Embedding-0.6B/         # Text embedding model (required)
+        ├── acestep-v15-turbo/            # DiT model (required)
+        └── acestep-5Hz-lm-1.7B/          # LLM model (choose one)
+        └── acestep-5Hz-lm-4B/            # LLM model (optional, better quality)
+```
+
+### Download Methods
+
+#### Method 1: Download from HuggingFace (Recommended)
+
+```bash
+# Download main model package (includes all required models)
+huggingface-cli download ACE-Step/Ace-Step1.5 --local-dir ComfyUI/models/ACE-Step
+
+# Optional: Download 4B LLM model for better quality
+huggingface-cli download ACE-Step/acestep-5Hz-lm-4B --local-dir ComfyUI/models/ACE-Step/acestep-5Hz-lm-4B
+```
+
+#### Method 2: Download from ModelScope (For China users)
+
+```bash
+# Install modelscope CLI
+pip install modelscope
+
+# Download main model
+modelscope download --model ACE-Step/Ace-Step1.5 --local_dir ComfyUI/models/ACE-Step
+```
+
+#### Method 3: Manual Download
+
+| Model | HuggingFace | Description |
+|-------|-------------|-------------|
+| **Main Package** | [ACE-Step/Ace-Step1.5](https://huggingface.co/ACE-Step/Ace-Step1.5) | Contains: vae, Qwen3-Embedding-0.6B, acestep-v15-turbo, acestep-5Hz-lm-1.7B |
+| acestep-5Hz-lm-4B | [ACE-Step/acestep-5Hz-lm-4B](https://huggingface.co/ACE-Step/acestep-5Hz-lm-4B) | Large LLM model (4B params, best quality) |
+| acestep-5Hz-lm-0.6B | [ACE-Step/acestep-5Hz-lm-0.6B](https://huggingface.co/ACE-Step/acestep-5Hz-lm-0.6B) | Lightweight LLM model (0.6B params, for low VRAM) |
+
+### LLM Model Selection Guide
+
+| Your GPU VRAM | Recommended LLM Model | Notes |
+|---------------|----------------------|-------|
+| **≤6GB** | None (DiT only) | LLM disabled to save memory |
+| **6-12GB** | acestep-5Hz-lm-0.6B | Lightweight, good balance |
+| **12-16GB** | acestep-5Hz-lm-1.7B | Better quality (default) |
+| **≥16GB** | acestep-5Hz-lm-4B | Best quality |
 
 ## 🚀 Usage
 
 ### Basic Workflow
 
 1. **Loader Node** - Load ACE-Step models (DiT + LLM)
+   - Select LLM type: `acestep-5Hz-lm-1.7B` or `acestep-5Hz-lm-4B`
 2. **GenerationParams Node** - Set music parameters:
    - Caption: Music style description
    - Lyrics: Song lyrics
@@ -48,9 +96,10 @@ Model download link: [ACE-Step Official Repository](https://github.com/ace-step/
 ### Artist Mode
 
 Use the **Artist Node** for AI-assisted composition:
-- Input a simple prompt
-- LLM generates caption, lyrics, and music parameters automatically
+- Input a simple prompt describing the song you want
+- LLM automatically generates caption, lyrics, and music parameters
 - Supports 50+ languages for vocals
+- Optional instrumental mode (no vocals)
 
 ## 📝 Node Reference
 
@@ -63,7 +112,7 @@ Use the **Artist Node** for AI-assisted composition:
 
 ## 🌐 Supported Languages
 
-Auto Detect, Arabic, Azerbaijani, Bengali, Bulgarian, Catalan, Chinese, Czech, Danish, Dutch, English, Finnish, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Spanish, Swedish, Thai, Turkish, Ukrainian, Vietnamese, and more.
+Auto Detect, Arabic, Azerbaijani, Bengali, Bulgarian, Catalan, Chinese, Czech, Danish, Dutch, English, Finnish, French, German, Greek, Hebrew, Hindi, Hungarian, Indonesian, Italian, Japanese, Korean, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Spanish, Swedish, Thai, Turkish, Ukrainian, Vietnamese, Cantonese, and more (50+ languages).
 
 ## 📄 License
 
@@ -71,6 +120,11 @@ This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENS
 
 ## 🔗 Links
 
-- [ACE-Step Official](https://github.com/ace-step/ACE-Step)
+- [ACE-Step 1.5 Official](https://github.com/ace-step/ACE-Step-1.5) - Original ACE-Step project
+- [HuggingFace Models](https://huggingface.co/ACE-Step) - Model downloads
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
 - [RunningHub](https://runninghub.cn)
+
+## 🙏 Acknowledgements
+
+This project is based on [ACE-Step 1.5](https://github.com/ace-step/ACE-Step-1.5), co-led by ACE Studio and StepFun.
