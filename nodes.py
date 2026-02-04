@@ -129,13 +129,82 @@ class RunningHub_ACEStep_Creator:
         return (audio, )
 
 class RunningHub_ACEStep_Artist:
+    # Supported vocal languages from ACE-Step
+    # See: https://github.com/ace-step/ACE-Step-1.5
+    VALID_LANGUAGES = [
+        'unknown',  # Auto-detect (default)
+        'ar', 'az', 'bg', 'bn', 'ca', 'cs', 'da', 'de', 'el', 'en',
+        'es', 'fa', 'fi', 'fr', 'he', 'hi', 'hr', 'ht', 'hu', 'id',
+        'is', 'it', 'ja', 'ko', 'la', 'lt', 'ms', 'ne', 'nl', 'no',
+        'pa', 'pl', 'pt', 'ro', 'ru', 'sa', 'sk', 'sr', 'sv', 'sw',
+        'ta', 'te', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'yue', 'zh',
+    ]
+    
+    # Language display names for better UX
+    LANGUAGE_NAMES = {
+        'unknown': 'Auto Detect',
+        'ar': 'Arabic (ar)',
+        'az': 'Azerbaijani (az)',
+        'bg': 'Bulgarian (bg)',
+        'bn': 'Bengali (bn)',
+        'ca': 'Catalan (ca)',
+        'cs': 'Czech (cs)',
+        'da': 'Danish (da)',
+        'de': 'German (de)',
+        'el': 'Greek (el)',
+        'en': 'English (en)',
+        'es': 'Spanish (es)',
+        'fa': 'Persian (fa)',
+        'fi': 'Finnish (fi)',
+        'fr': 'French (fr)',
+        'he': 'Hebrew (he)',
+        'hi': 'Hindi (hi)',
+        'hr': 'Croatian (hr)',
+        'ht': 'Haitian Creole (ht)',
+        'hu': 'Hungarian (hu)',
+        'id': 'Indonesian (id)',
+        'is': 'Icelandic (is)',
+        'it': 'Italian (it)',
+        'ja': 'Japanese (ja)',
+        'ko': 'Korean (ko)',
+        'la': 'Latin (la)',
+        'lt': 'Lithuanian (lt)',
+        'ms': 'Malay (ms)',
+        'ne': 'Nepali (ne)',
+        'nl': 'Dutch (nl)',
+        'no': 'Norwegian (no)',
+        'pa': 'Punjabi (pa)',
+        'pl': 'Polish (pl)',
+        'pt': 'Portuguese (pt)',
+        'ro': 'Romanian (ro)',
+        'ru': 'Russian (ru)',
+        'sa': 'Sanskrit (sa)',
+        'sk': 'Slovak (sk)',
+        'sr': 'Serbian (sr)',
+        'sv': 'Swedish (sv)',
+        'sw': 'Swahili (sw)',
+        'ta': 'Tamil (ta)',
+        'te': 'Telugu (te)',
+        'th': 'Thai (th)',
+        'tl': 'Tagalog (tl)',
+        'tr': 'Turkish (tr)',
+        'uk': 'Ukrainian (uk)',
+        'ur': 'Urdu (ur)',
+        'vi': 'Vietnamese (vi)',
+        'yue': 'Cantonese (yue)',
+        'zh': 'Chinese (zh)',
+    }
 
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
+        # Create display list with readable names
+        language_choices = [cls.LANGUAGE_NAMES.get(lang, lang) for lang in cls.VALID_LANGUAGES]
         return {
             "required": {
                 'llm_handler': ('ACEStepLLM', ),
                 'prompt': ('STRING', {'default': "", 'multiline': True}),
+                'vocal_language': (language_choices, {'default': 'Auto Detect'}),
+                'instrumental': ('BOOLEAN', {'default': False}),
                 'seed': ('INT', {'default': 42, 'min': 0, 'max': 4294967295}),
             }
         }
@@ -145,10 +214,29 @@ class RunningHub_ACEStep_Artist:
     FUNCTION = "generate"
     CATEGORY = "RunningHub/ACE-Step"
 
+    @classmethod
+    def _get_language_code(cls, display_name: str) -> str:
+        """Convert display name back to language code."""
+        for code, name in cls.LANGUAGE_NAMES.items():
+            if name == display_name:
+                return code
+        return 'unknown'
+
     def generate(self, **kwargs):
         llm_handler = kwargs.get('llm_handler', None)
         prompt = kwargs.get('prompt', None)
-        result = create_sample(llm_handler, prompt)
+        vocal_language_display = kwargs.get('vocal_language', 'Auto Detect')
+        instrumental = kwargs.get('instrumental', False)
+        
+        # Convert display name to language code
+        vocal_language = self._get_language_code(vocal_language_display)
+        
+        result = create_sample(
+            llm_handler, 
+            prompt,
+            instrumental=instrumental,
+            vocal_language=vocal_language if vocal_language != 'unknown' else None
+        )
         if result.success:
             caption = result.caption
             lyrics = result.lyrics
@@ -156,6 +244,7 @@ class RunningHub_ACEStep_Artist:
             duration = result.duration
             keyscale = result.keyscale
             timesignature = result.timesignature
+            language = result.language or vocal_language  # Use detected language or user selection
             params = GenerationParams(
                 caption=caption,
                 lyrics=lyrics,
@@ -163,6 +252,8 @@ class RunningHub_ACEStep_Artist:
                 duration=duration,
                 keyscale=keyscale,
                 timesignature=timesignature,
+                vocal_language=language,
+                instrumental=instrumental,
             )
             return (params, )
         else:
