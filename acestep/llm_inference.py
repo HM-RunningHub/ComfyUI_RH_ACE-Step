@@ -219,16 +219,19 @@ class LLMHandler:
     def _load_pytorch_model(self, model_path: str, device: str) -> Tuple[bool, str]:
         """Load PyTorch model from path and return (success, status_message)"""
         try:
-            self.llm = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True)
-            if not self.offload_to_cpu:
-                self.llm = self.llm.to(device).to(self.dtype)
-            else:
-                self.llm = self.llm.to("cpu").to(self.dtype)
+            # Load model with specified dtype to avoid global state changes
+            target_device = "cpu" if self.offload_to_cpu else device
+            self.llm = AutoModelForCausalLM.from_pretrained(
+                model_path, 
+                trust_remote_code=True,
+                torch_dtype=self.dtype,
+                device_map=target_device,
+            )
             self.llm.eval()
             self.llm_backend = "pt"
             self.llm_initialized = True
-            logger.info(f"5Hz LM initialized successfully using PyTorch backend on {device}")
-            status_msg = f"✅ 5Hz LM initialized successfully\nModel: {model_path}\nBackend: PyTorch\nDevice: {device}"
+            logger.info(f"5Hz LM initialized successfully using PyTorch backend on {target_device}")
+            status_msg = f"✅ 5Hz LM initialized successfully\nModel: {model_path}\nBackend: PyTorch\nDevice: {target_device}"
             return True, status_msg
         except Exception as e:
             return False, f"❌ Error initializing 5Hz LM: {str(e)}\n\nTraceback:\n{traceback.format_exc()}"
