@@ -80,18 +80,28 @@ modelscope download --model ACE-Step/Ace-Step1.5 --local_dir ComfyUI/models/ACE-
 
 ## 🚀 Usage
 
+### Example Workflow
+
+Download the example workflow from [`workflows/example_workflow.json`](workflows/example_workflow.json) and import it into ComfyUI.
+
+The example demonstrates two generation modes:
+
+1. **Artist Mode** - Simple prompt: "一首中国风伤感恋爱歌曲" (A Chinese-style sad love song)
+2. **Manual Mode** - Full control with custom caption, lyrics, BPM, duration, key, and time signature
+
 ### Basic Workflow
 
 1. **Loader Node** - Load ACE-Step models (DiT + LLM)
    - Select LLM type: `acestep-5Hz-lm-1.7B` or `acestep-5Hz-lm-4B`
 2. **GenerationParams Node** - Set music parameters:
    - Caption: Music style description
-   - Lyrics: Song lyrics
+   - Lyrics: Song lyrics (with structure tags like `[Verse]`, `[Chorus]`)
    - BPM: Beats per minute (30-300)
    - Duration: Length in seconds (10-600)
    - Key Scale: Musical key (e.g., "B minor")
    - Time Signature: Beats per measure (e.g., "4")
 3. **Creator Node** - Generate the music
+4. **SaveAudio Node** - Save the generated audio
 
 ### Artist Mode
 
