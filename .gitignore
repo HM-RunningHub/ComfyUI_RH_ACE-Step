@@ -1,0 +1,45 @@
+# Sensitive files - DO NOT COMMIT
+sync.sh
+cptorh01.sh
+rh_config.json
+config.json
+.env
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+*.egg-info/
+*.egg
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large files
+*.pth
+*.ckpt
+*.safetensors
+*.bin
+models/
+weights/
+save_audio/
+
+# Logs
+*.log
+*.tmp
