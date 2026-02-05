@@ -1,0 +1,20 @@
+# ComfyUI_RH_ACE-Step Dependencies
+# Note: PyTorch is provided by ComfyUI, do not install separately
+
+# Core dependencies
+transformers>=4.51.0,<4.58.0
+diffusers
+einops>=0.8.1
+accelerate>=1.12.0
+scipy>=1.10.1
+soundfile>=0.13.1
+loguru>=0.7.3
+numba>=0.63.1
+vector-quantize-pytorch>=1.27.15
+modelscope
+
+# Training dependencies (required for LoRA training)
+peft>=0.7.0
+
+# nano-vllm dependencies
+xxhash

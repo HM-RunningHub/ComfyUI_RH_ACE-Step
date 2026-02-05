@@ -20,7 +20,14 @@ cd ComfyUI/custom_nodes
 git clone https://github.com/HM-RunningHub/ComfyUI_RH_ACE-Step.git
 ```
 
-2. Restart ComfyUI
+2. Install dependencies:
+
+```bash
+cd ComfyUI_RH_ACE-Step
+pip install -r requirements.txt
+```
+
+3. Restart ComfyUI
 
 ## 📦 Model Download & Installation
 
